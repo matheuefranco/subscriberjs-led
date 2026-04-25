@@ -11,6 +11,7 @@ const topicInput = document.getElementById("topicInput");
 const applyTopicBtn = document.getElementById("applyTopicBtn");
 const ledCircle = document.getElementById("ledCircle");
 const ledStateText = document.getElementById("ledStateText");
+const ledCard = document.getElementById("ledCard");
 
 let client = null;
 const messages = [];
@@ -90,6 +91,7 @@ function connect() {
     lastMessage.innerHTML = `<strong>Mensagem recebida:</strong> ${payload} <br><small>Tópico: ${topic}</small>`;
     addMessageToHistory(payload);
     updateLedState(payload);
+    ledCard.classList.remove("d-none");
   });
 
   client.on("reconnect", () => {
