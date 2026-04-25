@@ -1,0 +1,86 @@
+:root {
+  --ifs-green: #006633;
+  --ifs-green-dark: #004d26;
+  --ifs-yellow: #ffcc00;
+  --ifs-yellow-hover: #e6b800;
+}
+
+body {
+  background-color: #f4f6f4;
+}
+
+/* ── Cabeçalho institucional ── */
+.ifs-header {
+  background-color: var(--ifs-green);
+  color: #fff;
+  border-bottom: 5px solid var(--ifs-yellow);
+}
+
+.ifs-header .badge-curso {
+  background-color: var(--ifs-yellow);
+  color: var(--ifs-green-dark);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+/* ── Card principal ── */
+.ifs-card {
+  border-top: 4px solid var(--ifs-green);
+}
+
+/* ── Botões ── */
+.btn-ifs {
+  background-color: var(--ifs-green);
+  border-color: var(--ifs-green);
+  color: #fff;
+}
+.btn-ifs:hover,
+.btn-ifs:focus {
+  background-color: var(--ifs-green-dark);
+  border-color: var(--ifs-green-dark);
+  color: #fff;
+}
+
+.btn-ifs-outline {
+  border-color: var(--ifs-green);
+  color: var(--ifs-green);
+}
+.btn-ifs-outline:hover {
+  background-color: var(--ifs-green);
+  color: #fff;
+}
+
+/* ── Seção do LED ── */
+.led-wrapper {
+  background-color: #1a1a1a;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+#circuloLed {
+  width: 88px;
+  height: 88px;
+  background-color: #dc3545;
+  border-radius: 50%;
+  box-shadow: 0 0 18px 6px rgba(220, 53, 69, 0.55);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#circuloLed.led-on {
+  background-color: #28a745;
+  box-shadow: 0 0 24px 8px rgba(40, 167, 69, 0.65);
+}
+
+/* ── Nota didática ── */
+.didactic-box {
+  border-left: 4px solid var(--ifs-yellow);
+  background-color: #fffbe6;
+}
+
+/* ── Footer ── */
+.ifs-footer {
+  background-color: var(--ifs-green);
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.82rem;
+}

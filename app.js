@@ -1,145 +1,145 @@
-const BROKER_URL = "wss://broker.hivemq.com:8884/mqtt";
-let currentTopic = "ifsuldeminas/matheusfranco/ledstatus";
+const URL_BROKER = "wss://broker.hivemq.com:8884/mqtt";
+let topicoAtual = "ifsuldeminas/matheusfranco/ledstatus";
 
-const statusBadge = document.getElementById("statusBadge");
-const connectBtn = document.getElementById("connectBtn");
-const disconnectBtn = document.getElementById("disconnectBtn");
-const lastMessage = document.getElementById("lastMessage");
-const historyList = document.getElementById("historyList");
-const topicText = document.getElementById("topicText");
-const topicInput = document.getElementById("topicInput");
-const applyTopicBtn = document.getElementById("applyTopicBtn");
-const ledCircle = document.getElementById("ledCircle");
-const ledStateText = document.getElementById("ledStateText");
-const ledCard = document.getElementById("ledCard");
+const emblemaStatus = document.getElementById("emblemaStatus");
+const botaoConectar = document.getElementById("botaoConectar");
+const botaoDesconectar = document.getElementById("botaoDesconectar");
+const ultimaMensagem = document.getElementById("ultimaMensagem");
+const listaHistorico = document.getElementById("listaHistorico");
+const textoTopico = document.getElementById("textoTopico");
+const entradaTopico = document.getElementById("entradaTopico");
+const botaoAplicarTopico = document.getElementById("botaoAplicarTopico");
+const circuloLed = document.getElementById("circuloLed");
+const textoEstadoLed = document.getElementById("textoEstadoLed");
+const cartaoLed = document.getElementById("cartaoLed");
 
-let client = null;
-const messages = [];
+let cliente = null;
+const mensagens = [];
 
-function setStatus(text, colorClass) {
-  statusBadge.textContent = text;
-  statusBadge.className = `badge ${colorClass}`;
+function definirStatus(texto, classeCor) {
+  emblemaStatus.textContent = texto;
+  emblemaStatus.className = `badge ${classeCor}`;
 }
 
-function addMessageToHistory(payload) {
-  const now = new Date();
-  const timestamp = now.toLocaleTimeString("pt-BR");
+function adicionarMensagemNoHistorico(mensagem) {
+  const agora = new Date();
+  const horario = agora.toLocaleTimeString("pt-BR");
 
-  messages.unshift(`${timestamp} - ${payload}`);
-  if (messages.length > 10) {
-    messages.pop();
+  mensagens.unshift(`${horario} - ${mensagem}`);
+  if (mensagens.length > 10) {
+    mensagens.pop();
   }
 
-  historyList.innerHTML = "";
-  messages.forEach((item) => {
+  listaHistorico.innerHTML = "";
+  mensagens.forEach((item) => {
     const li = document.createElement("li");
     li.className = "list-group-item";
     li.textContent = item;
-    historyList.appendChild(li);
+    listaHistorico.appendChild(li);
   });
 }
 
-function updateLedState(payload) {
-  const normalized = payload.trim().toLowerCase();
+function atualizarEstadoLed(mensagem) {
+  const normalizado = mensagem.trim().toLowerCase();
 
-  if (normalized === "on") {
-    ledCircle.classList.add("led-on");
-    ledStateText.textContent = "ON";
+  if (normalizado === "on") {
+    circuloLed.classList.add("led-on");
+    textoEstadoLed.textContent = "ON";
     return;
   }
 
-  if (normalized === "off") {
-    ledCircle.classList.remove("led-on");
-    ledStateText.textContent = "OFF";
+  if (normalizado === "off") {
+    circuloLed.classList.remove("led-on");
+    textoEstadoLed.textContent = "OFF";
   }
 }
 
-function subscribeToTopic(topic) {
-  client.subscribe(topic, (error) => {
-    if (error) {
-      setStatus("Erro no subscribe", "text-bg-danger");
-      lastMessage.textContent = `Erro ao assinar o tópico: ${error.message}`;
+function assinarTopico(topico) {
+  cliente.subscribe(topico, (erro) => {
+    if (erro) {
+      definirStatus("Erro no subscribe", "text-bg-danger");
+      ultimaMensagem.textContent = `Erro ao assinar o tópico: ${erro.message}`;
       return;
     }
 
-    topicText.textContent = topic;
-    lastMessage.textContent = `Inscrito no tópico: ${topic}`;
+    textoTopico.textContent = topico;
+    ultimaMensagem.textContent = `Inscrito no tópico: ${topico}`;
   });
 }
 
-function connect() {
-  if (client && client.connected) return;
+function conectar() {
+  if (cliente && cliente.connected) return;
 
-  setStatus("Conectando...", "text-bg-warning");
+  definirStatus("Conectando...", "text-bg-warning");
 
-  client = mqtt.connect(BROKER_URL, {
+  cliente = mqtt.connect(URL_BROKER, {
     clientId: `subscriber_${Math.random().toString(16).slice(2, 10)}`,
     clean: true,
     reconnectPeriod: 2000
   });
 
-  client.on("connect", () => {
-    setStatus("Conectado", "text-bg-success");
-    connectBtn.disabled = true;
-    disconnectBtn.disabled = false;
+  cliente.on("connect", () => {
+    definirStatus("Conectado", "text-bg-success");
+    botaoConectar.disabled = true;
+    botaoDesconectar.disabled = false;
 
-    subscribeToTopic(currentTopic);
+    assinarTopico(topicoAtual);
   });
 
-  client.on("message", (topic, payloadBuffer) => {
-    const payload = payloadBuffer.toString();
-    lastMessage.innerHTML = `<strong>Mensagem recebida:</strong> ${payload} <br><small>Tópico: ${topic}</small>`;
-    addMessageToHistory(payload);
-    updateLedState(payload);
-    ledCard.classList.remove("d-none");
+  cliente.on("message", (topico, bufferMensagem) => {
+    const mensagem = bufferMensagem.toString();
+    ultimaMensagem.innerHTML = `<strong>Mensagem recebida:</strong> ${mensagem} <br><small>Tópico: ${topico}</small>`;
+    adicionarMensagemNoHistorico(mensagem);
+    atualizarEstadoLed(mensagem);
+    cartaoLed.classList.remove("d-none");
   });
 
-  client.on("reconnect", () => {
-    setStatus("Reconectando...", "text-bg-warning");
+  cliente.on("reconnect", () => {
+    definirStatus("Reconectando...", "text-bg-warning");
   });
 
-  client.on("error", (error) => {
-    setStatus("Erro", "text-bg-danger");
-    lastMessage.textContent = `Erro: ${error.message}`;
+  cliente.on("error", (erro) => {
+    definirStatus("Erro", "text-bg-danger");
+    ultimaMensagem.textContent = `Erro: ${erro.message}`;
   });
 
-  client.on("close", () => {
-    setStatus("Desconectado", "text-bg-secondary");
-    connectBtn.disabled = false;
-    disconnectBtn.disabled = true;
+  cliente.on("close", () => {
+    definirStatus("Desconectado", "text-bg-secondary");
+    botaoConectar.disabled = false;
+    botaoDesconectar.disabled = true;
   });
 }
 
-function disconnect() {
-  if (!client) return;
-  client.end(true);
+function desconectar() {
+  if (!cliente) return;
+  cliente.end(true);
 }
 
-function applyTopic() {
-  const newTopic = topicInput.value.trim();
+function aplicarTopico() {
+  const novoTopico = entradaTopico.value.trim();
 
-  if (!newTopic) {
-    lastMessage.textContent = "Informe um tópico válido.";
+  if (!novoTopico) {
+    ultimaMensagem.textContent = "Informe um tópico válido.";
     return;
   }
 
-  const previousTopic = currentTopic;
-  currentTopic = newTopic;
-  topicText.textContent = currentTopic;
+  const topicoAnterior = topicoAtual;
+  topicoAtual = novoTopico;
+  textoTopico.textContent = topicoAtual;
 
-  if (!client || !client.connected) {
-    lastMessage.textContent = `Tópico atualizado para: ${currentTopic}`;
+  if (!cliente || !cliente.connected) {
+    ultimaMensagem.textContent = `Tópico atualizado para: ${topicoAtual}`;
     return;
   }
 
-  client.unsubscribe(previousTopic, () => {
-    subscribeToTopic(currentTopic);
+  cliente.unsubscribe(topicoAnterior, () => {
+    assinarTopico(topicoAtual);
   });
 }
 
-topicText.textContent = currentTopic;
-topicInput.value = currentTopic;
+textoTopico.textContent = topicoAtual;
+entradaTopico.value = topicoAtual;
 
-connectBtn.addEventListener("click", connect);
-disconnectBtn.addEventListener("click", disconnect);
-applyTopicBtn.addEventListener("click", applyTopic);
+botaoConectar.addEventListener("click", conectar);
+botaoDesconectar.addEventListener("click", desconectar);
+botaoAplicarTopico.addEventListener("click", aplicarTopico);
