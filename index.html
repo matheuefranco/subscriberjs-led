@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Subscriber MQTT — IoT | IFSULDEMINAS</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <style>
+      :root {
+        --ifs-green: #006633;
+        --ifs-green-dark: #004d26;
+        --ifs-yellow: #ffcc00;
+        --ifs-yellow-hover: #e6b800;
+      }
+
+      body {
+        background-color: #f4f6f4;
+      }
+
+      /* ── Cabeçalho institucional ── */
+      .ifs-header {
+        background-color: var(--ifs-green);
+        color: #fff;
+        border-bottom: 5px solid var(--ifs-yellow);
+      }
+
+      .ifs-header .badge-curso {
+        background-color: var(--ifs-yellow);
+        color: var(--ifs-green-dark);
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+      }
+
+      /* ── Card principal ── */
+      .ifs-card {
+        border-top: 4px solid var(--ifs-green);
+      }
+
+      /* ── Botões ── */
+      .btn-ifs {
+        background-color: var(--ifs-green);
+        border-color: var(--ifs-green);
+        color: #fff;
+      }
+      .btn-ifs:hover,
+      .btn-ifs:focus {
+        background-color: var(--ifs-green-dark);
+        border-color: var(--ifs-green-dark);
+        color: #fff;
+      }
+
+      .btn-ifs-outline {
+        border-color: var(--ifs-green);
+        color: var(--ifs-green);
+      }
+      .btn-ifs-outline:hover {
+        background-color: var(--ifs-green);
+        color: #fff;
+      }
+
+      /* ── Seção do LED ── */
+      .led-wrapper {
+        background-color: #1a1a1a;
+        border-radius: 12px;
+        padding: 1.5rem;
+      }
+
+      #ledCircle {
+        width: 88px;
+        height: 88px;
+        background-color: #dc3545;
+        border-radius: 50%;
+        box-shadow: 0 0 18px 6px rgba(220, 53, 69, 0.55);
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      #ledCircle.led-on {
+        background-color: #28a745;
+        box-shadow: 0 0 24px 8px rgba(40, 167, 69, 0.65);
+      }
+
+      /* ── Nota didática ── */
+      .didactic-box {
+        border-left: 4px solid var(--ifs-yellow);
+        background-color: #fffbe6;
+      }
+
+      /* ── Footer ── */
+      .ifs-footer {
+        background-color: var(--ifs-green);
+        color: rgba(255, 255, 255, 0.75);
+        font-size: 0.82rem;
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- Cabeçalho institucional -->
+    <header class="ifs-header py-3">
+      <div class="container d-flex align-items-center gap-3">
+        <div>
+          <p class="mb-0 fw-bold fs-5 lh-1">IFSULDEMINAS</p>
+          <p class="mb-0" style="font-size:0.8rem; opacity:.85">Instituto Federal do Sul de Minas Gerais</p>
+        </div>
+        <div class="ms-auto text-end">
+          <span class="badge badge-curso rounded-pill px-3 py-2">Robótica e IoT</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="container py-4">
+      <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+
+          <!-- Nota didática -->
+          
+
+          <!-- Card principal -->
+          <div class="card shadow-sm ifs-card mb-4">
+            <div class="card-header bg-white border-bottom">
+              <h1 class="h5 mb-0 fw-semibold" style="color: var(--ifs-green)">
+                Subscriber MQTT — Estado do LED
+              </h1>
+            </div>
+
+            <div class="card-body">
+
+              <!-- Info conexão -->
+              <ul class="list-group list-group-flush mb-4">
+                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                  <span class="text-muted small">Broker</span>
+                  <span class="badge rounded-pill text-bg-secondary" id="brokerText">broker.hivemq.com</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                  <span class="text-muted small">Tópico ativo</span>
+                  <span class="badge rounded-pill" style="background-color: var(--ifs-green)" id="topicText">—</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                  <span class="text-muted small">Status</span>
+                  <span class="badge rounded-pill text-bg-warning" id="statusBadge">Desconectado</span>
+                </li>
+              </ul>
+
+              <!-- Editar tópico -->
+              <div class="mb-4">
+                <label for="topicInput" class="form-label fw-semibold small">Tópico MQTT</label>
+                <div class="input-group">
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    id="topicInput"
+                    placeholder="ex: ifsuldeminas/iot/led"
+                  />
+                  <button class="btn btn-sm btn-ifs-outline" id="applyTopicBtn" type="button">
+                    Aplicar
+                  </button>
+                </div>
+                <div class="form-text">
+                  Altere o tópico e clique em <em>Aplicar</em>. Se já estiver conectado, o subscribe é trocado automaticamente.
+                </div>
+              </div>
+
+              <!-- Botões -->
+              <div class="d-flex gap-2 mb-4">
+                <button class="btn btn-ifs btn-sm px-4" id="connectBtn">Conectar</button>
+                <button class="btn btn-outline-danger btn-sm px-4" id="disconnectBtn" disabled>Desconectar</button>
+              </div>
+
+              <!-- Última mensagem -->
+              <div class="alert alert-secondary small mb-0" id="lastMessage">
+                Nenhuma mensagem recebida ainda.
+              </div>
+
+            </div>
+          </div>
+
+          <!-- LED -->
+          <div class="card shadow-sm mb-4">
+            <div class="card-body led-wrapper text-center">
+              <p class="text-white-50 small mb-3 text-uppercase letter-spacing-1">Estado do LED</p>
+              <div id="ledCircle" class="mx-auto mb-3" aria-label="Indicador do LED"></div>
+              <p class="fw-bold mb-0 fs-4" id="ledStateText" style="color: #fff">OFF</p>
+            </div>
+          </div>
+
+          <!-- Histórico -->
+          <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+              <span class="small fw-semibold" style="color: var(--ifs-green)">Histórico de mensagens</span>
+              <span class="badge rounded-pill text-bg-light border small">últimas 10</span>
+            </div>
+            <ul class="list-group list-group-flush" id="historyList">
+              <li class="list-group-item text-muted small">Aguardando mensagens...</li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+    </main>
+
+    <footer class="ifs-footer text-center py-3 mt-2">
+      IFSULDEMINAS &mdash; Robótica e IoT - Professores Matheus Franco e Vinícius Souza &mdash; Material de uso exclusivamente didático
+    </footer>
+
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
