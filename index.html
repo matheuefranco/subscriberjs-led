@@ -93,6 +93,46 @@
             </div>
           </div>
 
+          <!-- Card de Publicação -->
+          <div class="card shadow-sm ifs-card mb-4">
+            <div class="card-header bg-white border-bottom">
+              <h2 class="h5 mb-0 fw-semibold" style="color: var(--ifs-green)">
+                Publish — Enviar Mensagem
+              </h2>
+            </div>
+
+            <div class="card-body">
+              <!-- Tópico para publicar -->
+              <div class="mb-3">
+                <label for="entradaTopicoPublish" class="form-label fw-semibold small">Tópico</label>
+                <input
+                  type="text"
+                  class="form-control form-control-sm"
+                  id="entradaTopicoPublish"
+                  placeholder="ex: ifsuldeminas/iot/comando"
+                />
+              </div>
+
+              <!-- Mensagem -->
+              <div class="mb-3">
+                <label for="entradaMensagemPublish" class="form-label fw-semibold small">Mensagem</label>
+                <textarea
+                  class="form-control form-control-sm"
+                  id="entradaMensagemPublish"
+                  placeholder="Digite a mensagem"
+                  rows="3"
+                ></textarea>
+              </div>
+
+              <!-- Botão Publicar -->
+              <div class="d-grid gap-2">
+                <button class="btn btn-ifs btn-sm" id="botaoPublicar" type="button">
+                  Publicar
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- LED -->
           <div class="card shadow-sm mb-4 d-none" id="cartaoLed">
             <div class="card-body led-wrapper text-center">

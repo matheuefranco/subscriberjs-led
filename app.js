@@ -1,5 +1,5 @@
 const URL_BROKER = "wss://broker.hivemq.com:8884/mqtt";
-let topicoAtual = "ifsuldeminas/matheusfranco/ledstatus";
+let topicoAtual = "ifsuldeminas/SEUGRUPO/ledstatus";
 
 const emblemaStatus = document.getElementById("emblemaStatus");
 const botaoConectar = document.getElementById("botaoConectar");
@@ -12,6 +12,9 @@ const botaoAplicarTopico = document.getElementById("botaoAplicarTopico");
 const circuloLed = document.getElementById("circuloLed");
 const textoEstadoLed = document.getElementById("textoEstadoLed");
 const cartaoLed = document.getElementById("cartaoLed");
+const entradaTopicoPublish = document.getElementById("entradaTopicoPublish");
+const entradaMensagemPublish = document.getElementById("entradaMensagemPublish");
+const botaoPublicar = document.getElementById("botaoPublicar");
 
 let cliente = null;
 const mensagens = [];
@@ -137,9 +140,39 @@ function aplicarTopico() {
   });
 }
 
+function publicarMensagem() {
+  if (!cliente || !cliente.connected) {
+    ultimaMensagem.textContent = "Erro: Cliente não está conectado.";
+    ultimaMensagem.className = "alert alert-danger small mb-0";
+    return;
+  }
+
+  const topico = entradaTopicoPublish.value.trim();
+  const mensagem = entradaMensagemPublish.value.trim();
+
+  if (!topico || !mensagem) {
+    ultimaMensagem.textContent = "Erro: Tópico e mensagem são obrigatórios.";
+    ultimaMensagem.className = "alert alert-warning small mb-0";
+    return;
+  }
+
+  cliente.publish(topico, mensagem, { qos: 0, retain: false }, (erro) => {
+    if (erro) {
+      ultimaMensagem.textContent = `Erro ao publicar: ${erro.message}`;
+      ultimaMensagem.className = "alert alert-danger small mb-0";
+      return;
+    }
+
+    ultimaMensagem.textContent = `Mensagem publicada com sucesso em ${topico}: "${mensagem}"`;
+    ultimaMensagem.className = "alert alert-success small mb-0";
+    entradaMensagemPublish.value = "";
+  });
+}
+
 textoTopico.textContent = topicoAtual;
 entradaTopico.value = topicoAtual;
 
 botaoConectar.addEventListener("click", conectar);
 botaoDesconectar.addEventListener("click", desconectar);
 botaoAplicarTopico.addEventListener("click", aplicarTopico);
+botaoPublicar.addEventListener("click", publicarMensagem);
